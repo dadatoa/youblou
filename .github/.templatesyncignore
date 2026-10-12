@@ -1,0 +1,37 @@
+# .templatesyncignore
+#
+# Paths listed here are NOT overwritten by the template sync
+# (AndreasAugustin/actions-template-sync). After the upstream pull, each line is
+# passed to `git reset` to restore this repository's local version, so the sync
+# never pushes changes to these files.
+#
+# Each line is a git pathspec; one per line. Lines starting with # are ignored.
+# Files NOT listed here (e.g. disk_config/, Justfile, system_files/) are still
+# kept in sync with ublue-os/image-template.
+#
+# Remove a line when you want the upstream template to manage that file again.
+
+# --- image identity / build configuration ------------------------------------
+# Base image, IMAGE_NAME and REPO_ORGANIZATION live here. Syncing upstream would
+# reset these to the template defaults (IMAGE_NAME=image-template,
+# REPO_ORGANIZATION=alice-and-bob), which would publish the wrong image.
+image-template.env
+
+# --- container definition ----------------------------------------------------
+# Custom base image (ghcr.io/ublue-os/aurora-dx:stable) and local tweaks.
+Containerfile
+
+# --- packages / system tweaks ------------------------------------------------
+# Local package list and enabled units (cockpit, keepalived, openbao, ...).
+build_files/build.sh
+
+# --- project docs ------------------------------------------------------------
+# Custom README documenting this repo's fork/worktree update process.
+README.md
+
+# --- optional: uncomment if you start diverging on these ---------------------
+# The CI workflows are currently still synced from upstream. Uncomment the two
+# lines below to stop the sync from touching them (also removes the need for the
+# PAT to carry the `workflow` scope).
+# .github/workflows/build.yml
+# .github/workflows/build-disk.yml

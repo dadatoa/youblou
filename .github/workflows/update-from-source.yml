@@ -1,0 +1,41 @@
+name: "Sync Template Changes"
+
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  
+  # Optional: Automatically check for updates on a schedule (e.g., every Monday at midnight)
+  schedule:
+    - cron: "0 0 * * 1"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    steps:
+      # 1. Checkout your target repository
+      # NOTE: actions/checkout stores its `token` in the origin remote URL, and git
+      # uses those baked-in credentials for every later push -- the token the sync
+      # action configures at push time is ignored. So the PAT must be passed to
+      # checkout, not only to the action. GITHUB_TOKEN can never create/update files
+      # under .github/workflows/ (the `workflows` permission is not grantable), and the
+      # sync branch touches build.yml/build-disk.yml. The PAT needs `workflow` scope
+      # (classic) or Workflows: read+write (fine-grained).
+      - name: Checkout target repository
+        uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.PAT }}
+
+      # 2. Run the template sync action.
+      # target_gh_token only drives the gh CLI (PR/labels); the actual push uses the
+      # checkout token above.
+      - name: Run actions-template-sync
+        uses: AndreasAugustin/actions-template-sync@v2
+        with:
+          source_repo_path: "ublue-os/image-template.git"
+          upstream_branch: "main" # Change to "master" if the template uses master
+          source_gh_token: ${{ secrets.GITHUB_TOKEN }}
+          target_gh_token: ${{ secrets.PAT }}
